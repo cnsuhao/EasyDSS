@@ -1,0 +1,2 @@
+cd ./
+CMS.exe -d

@@ -1,0 +1,42 @@
+				EasyDSS分布式流媒体系统配置说明
+
+系统功能介绍：
+系统基于RTSP协议和Darwin Streaming Server（以下简称DSS）实现，具有设备接入和控制、分布式流媒体服务器部署、流媒体转发与负载均衡、实时音视频控制等功能，同时支持视频直播与点播功能，整套系统可跨平台运行（Windows/Linux）。
+
+
+系统功能模块：
+1、CMS：中心管理服务器，全局唯一运行。中心管理服务器接入来自设备端的注册连接、其他服务节点的连接（如流媒体服务器、回放点播服务器等）、客户端的请求连接。所有关于设备连接的维护与管理、控制命令的下发、设备信息上报解析，客户端请求控制，负载均衡等控制均由中心管理服务器进行。
+
+2、EasyDarwin：流媒体服务器，可分布式多点部署。流媒体服务器作为整套系统的流媒体服务节点单元，可多点、分布式部署于多个网络环境中，以实现具体的流媒体直播转发、点播回放等需求。
+
+3、EasyIpCamera：设备模拟器（For Win32）。模拟系统设备，连接并保活至中心管理服务器，接收来自CMS的控制命令。采集Windows摄像头视频与MicroPhone音频输入，分别利用x264和FAAC进行H264及AAC编码，再通过RTSP和RTP，将实时音视频数据推送到流媒体服务器，并由流媒体服务器进行转发和分发，实现直播。
+
+
+系统主要配置：
+1、CMS/CMS.xml
+	rtsp_port：配置CMS对rtsp的监听端口，所有的设备、流媒体服务器、客户端统一由此端口接入，默认为554端口。
+
+2、EasyDarwin/EasyDarwin.xml
+	rtsp_port：流媒体转发端口，设备端推送流媒体的端口，默认8554。
+	cms_addr：中心管理服务器的IP地址(尽量不要用本地回环地址127.0.0.1，除非CMS、EasyDarwin、EasyIpCamera都在一台机器上)。
+	cms_port：中心管理服务器rtsp监听端口，也就是上面CMS中配置的端口，如554端口。
+
+3、EasyIpCamera/config.ini
+	server：中心管理服务器CMS的域名或者IP。
+	port=554：中心管理服务器rtsp的监听端口，也就是1中配置的端口，如554端口。
+	device=live：设备ID，不可重复，否则设备无法注册到CMS。
+	suffix=sdp：不变即可。
+
+
+系统部署：
+	1、CMS：运行start.bat，以Debug模式运行CMS。
+	2、EasyDarwin：运行start.bat，以Debug模式运行EasyDarwin。
+	3、运行easyIpCamera.exe（注：需要配备USB摄像头）。
+
+
+获取视频：
+用VLC、CorePlayer等请求网络串流：rtsp://[CMS_IP]:[CMS_Port]/[Device_ID].sdp，例如：CMS服务器地址192.168.1.3，端口554，设备ID为live，请求地址为：rtsp://192.168.1.3:554/live.sdp
+
+
+注意!：
+	服务器注意设置端口例外或者关闭防火墙

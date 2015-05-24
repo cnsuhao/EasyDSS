@@ -1,0 +1,2 @@
+cd ./
+EasyDarwin.exe -d
